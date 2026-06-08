@@ -1,0 +1,465 @@
+EXPERIMENT: Implementation of User Authentication Technique for Remote Access of Network Device Using Cisco Packet Tracer
+
+AIM:
+To implement user authentication for secure remote access of a Cisco router using SSH in Cisco Packet Tracer.
+
+REQUIREMENTS:
+1. Cisco Packet Tracer
+2. One Router (e.g., 2811)
+3. One PC
+4. Copper Straight-Through Cable
+
+TOPOLOGY:
+PC ---------------- Router
+
+Router IP: 192.168.1.1/24
+PC IP: 192.168.1.2/24
+
+PROCEDURE:
+
+Step 1: Configure Router Interface
+
+Router> enable
+Router# configure terminal
+Router(config)# interface fastEthernet0/0
+Router(config-if)# ip address 192.168.1.1 255.255.255.0
+Router(config-if)# no shutdown
+Router(config-if)# exit
+
+Step 2: Configure Hostname and Domain Name
+
+Router(config)# hostname R1
+R1(config)# ip domain-name lab.local
+
+Step 3: Create Username and Password
+
+R1(config)# username admin privilege 15 secret cisco123
+
+Step 4: Generate RSA Key
+
+R1(config)# crypto key generate rsa
+
+How many bits in the modulus [512]: 1024
+
+Step 5: Enable SSH Version 2
+
+R1(config)# ip ssh version 2
+
+Step 6: Configure VTY Lines
+
+R1(config)# line vty 0 4
+R1(config-line)# login local
+R1(config-line)# transport input ssh
+R1(config-line)# exit
+
+Step 7: Configure Enable Secret Password
+
+R1(config)# enable secret class123
+
+Step 8: Save Configuration
+
+R1(config)# end
+R1# copy running-config startup-config
+
+Destination filename [startup-config]?
+[Press Enter]
+
+PC CONFIGURATION:
+
+IP Address      : 192.168.1.2
+Subnet Mask     : 255.255.255.0
+Default Gateway : 192.168.1.1
+
+VERIFICATION:
+
+1. Check Connectivity
+
+PC> ping 192.168.1.1
+
+2. Access Router Remotely Using SSH
+
+PC> ssh -l admin 192.168.1.1
+
+Password: cisco123
+
+3. Verification Commands
+
+R1# show ip ssh
+R1# show users
+R1# show running-config
+
+EXPECTED OUTPUT:
+
+Password:
+R1>
+
+RESULT:
+Successfully implemented user authentication using SSH for secure remote access to the Cisco router. The router was configured with a local user database and SSH service, allowing authenticated users to remotely manage the network device.
+
+
+
+
+EXPERIMENT: Implementation of an AAA Server as a User Authentication and Authorization Technique for Remote Access to a Network Device Using Cisco Packet Tracer
+
+AIM:
+To configure and implement an AAA (Authentication, Authorization, and Accounting) server for secure remote access to a Cisco router using Cisco Packet Tracer.
+
+REQUIREMENTS:
+• Cisco Packet Tracer
+• One Router (2811)
+• One Switch (2960)
+• One Server
+• One PC
+• Copper Straight-Through Cables
+
+TOPOLOGY:
+
+                Router
+                   |
+                Switch
+               /      \
+             PC      AAA Server
+
+Router IP      : 192.168.1.1/24
+PC IP          : 192.168.1.2/24
+AAA Server IP  : 192.168.1.3/24
+
+PROCEDURE:
+
+STEP 1: Configure Router Interface
+
+Router> enable
+Router# configure terminal
+
+Router(config)# interface fastEthernet0/0
+Router(config-if)# ip address 192.168.1.1 255.255.255.0
+Router(config-if)# no shutdown
+Router(config-if)# exit
+
+STEP 2: Configure AAA Server
+
+Server → Desktop → IP Configuration
+
+IP Address      : 192.168.1.3
+Subnet Mask     : 255.255.255.0
+Default Gateway : 192.168.1.1
+
+Server → Services → AAA
+
+Turn AAA Service ON
+
+Add User:
+
+Username : admin
+Password : cnslab
+
+Click Add.
+
+STEP 3: Configure AAA Authentication on Router
+
+Router(config)# aaa new-model
+
+Router(config)# radius-server host 192.168.1.3 key cisco
+
+Router(config)# aaa authentication login default group radius local
+
+Router(config)# aaa authorization exec default group radius local
+
+STEP 4: Configure VTY Lines
+
+Router(config)# line vty 0 4
+Router(config-line)# login authentication default
+Router(config-line)# transport input telnet
+Router(config-line)# exit
+
+STEP 5: Configure Enable Secret Password
+
+Router(config)# enable secret class
+
+STEP 6: Save Configuration
+
+Router(config)# end
+Router# copy running-config startup-config
+
+Destination filename [startup-config]?
+[Press Enter]
+
+STEP 7: Configure PC IP Address
+
+PC → Desktop → IP Configuration
+
+IP Address      : 192.168.1.2
+Subnet Mask     : 255.255.255.0
+Default Gateway : 192.168.1.1
+
+VERIFICATION:
+
+1. Test Connectivity
+
+PC> ping 192.168.1.1
+
+PC> ping 192.168.1.3
+
+2. Remote Login Using AAA Authentication
+
+PC> telnet 192.168.1.1
+
+Username: admin
+Password: cnslab
+
+3. Verification Commands
+
+Router# show running-config
+
+Router# show aaa servers
+
+Router# show users
+
+EXPECTED OUTPUT:
+
+Trying 192.168.1.1 ...
+
+User Access Verification
+
+Username: admin
+Password: cnslab
+
+Router>
+
+RESULT:
+
+Successfully implemented an AAA (Authentication, Authorization and Accounting) server for remote access authentication and authorization of a Cisco router in Cisco Packet Tracer. The router authenticated users through the AAA server, ensuring secure access to the network device.
+
+
+enable
+configure terminal
+
+interface fastEthernet0/0
+ip address 192.168.1.1 255.255.255.0
+no shutdown
+exit
+
+aaa new-model
+
+radius-server host 192.168.1.3 key cisco
+
+aaa authentication login default group radius local
+aaa authorization exec default group radius local
+
+line vty 0 4
+login authentication default
+transport input telnet
+exit
+
+enable secret class
+
+end
+copy running-config startup-config
+
+
+
+
+AAA Service : ON
+Client Name : Router
+Server Type : RADIUS
+Key         : cisco
+
+Username    : admin
+Password    : cnslab
+
+
+telnet 192.168.1.1
+
+Username: admin
+Password: cnslab
+
+
+
+
+EXPERIMENT: Creating and Implementing a User Access List for Permit and Deny Remote Hosts Using Cisco Packet Tracer
+
+AIM:
+To create and implement Standard and Extended Access Control Lists (ACLs) to permit and deny access from remote hosts in a computer network using Cisco Packet Tracer.
+
+REQUIREMENTS:
+• Cisco Packet Tracer
+• One Router
+• One Switch
+• Three PCs
+• One Server
+• Copper Straight-Through Cables
+
+TOPOLOGY:
+
+                  Router
+                     |
+                  Switch
+               /    |    \
+            PC0   PC1   PC2
+                     |
+                  Server
+
+IP ADDRESSING:
+
+PC0     : 10.10.10.10
+PC1     : 10.10.10.11
+PC2     : 10.10.10.12
+Server  : 192.168.1.10
+Router  : 10.10.10.1 / 192.168.1.1
+
+THEORY:
+
+An Access Control List (ACL) is a set of rules used by routers to control network traffic. ACLs can permit or deny packets based on source address, destination address, protocol type, or port number.
+
+Types of ACLs:
+1. Standard ACL – Filters traffic based on source IP address.
+2. Extended ACL – Filters traffic based on source IP, destination IP, protocol, and port number.
+
+PROCEDURE:
+
+PART A: STANDARD ACL (DENY PC1 AND PERMIT OTHERS)
+
+Step 1: Configure Router Interfaces
+
+Router> enable
+Router# configure terminal
+
+Router(config)# interface fastethernet0/0
+Router(config-if)# ip address 10.10.10.1 255.255.255.0
+Router(config-if)# no shutdown
+Router(config-if)# exit
+
+Router(config)# interface fastethernet1/0
+Router(config-if)# ip address 192.168.1.1 255.255.255.0
+Router(config-if)# no shutdown
+Router(config-if)# exit
+
+Step 2: Create Standard ACL
+
+Router(config)# access-list 10 deny 10.10.10.11 0.0.0.0
+Router(config)# access-list 10 permit any
+
+Step 3: Apply ACL to Interface
+
+Router(config)# interface fa0/0
+Router(config-if)# ip access-group 10 in
+Router(config-if)# exit
+
+Step 4: Save Configuration
+
+Router(config)# end
+Router# copy running-config startup-config
+
+VERIFICATION:
+
+From PC1 (10.10.10.11)
+
+PC> ping 192.168.1.10
+
+Result:
+Request timed out / Destination Host Unreachable
+
+From PC0 (10.10.10.10)
+
+PC> ping 192.168.1.10
+
+Result:
+Reply received successfully
+
+--------------------------------------------------
+
+PART B: EXTENDED ACL (BLOCK FTP ACCESS ONLY)
+
+Step 1: Configure Extended ACL
+
+Router> enable
+Router# configure terminal
+
+Router(config)# access-list 100 permit tcp host 10.10.10.10 host 192.168.1.10 eq ftp
+
+Router(config)# access-list 100 deny tcp host 10.10.10.11 host 192.168.1.10 eq ftp
+
+Router(config)# access-list 100 permit ip any any
+
+Step 2: Apply ACL
+
+Router(config)# interface fa0/0
+Router(config-if)# ip access-group 100 in
+Router(config-if)# exit
+
+Step 3: Save Configuration
+
+Router(config)# end
+Router# copy running-config startup-config
+
+VERIFICATION:
+
+From PC0
+
+PC> ftp 192.168.1.10
+
+Result:
+FTP Connection Successful
+
+From PC1
+
+PC> ftp 192.168.1.10
+
+Result:
+Connection Timed Out / Access Denied
+
+From PC1
+
+PC> ping 192.168.1.10
+
+Result:
+Successful (only FTP is blocked)
+
+VERIFICATION COMMANDS:
+
+Router# show access-lists
+
+Router# show running-config
+
+Router# show ip interface
+
+EXPECTED OUTPUT:
+
+Standard ACL:
+10 deny 10.10.10.11
+10 permit any
+
+Extended ACL:
+100 permit tcp host 10.10.10.10 host 192.168.1.10 eq ftp
+100 deny tcp host 10.10.10.11 host 192.168.1.10 eq ftp
+100 permit ip any any
+
+RESULT:
+
+Successfully created and implemented Access Control Lists (ACLs) to permit and deny remote hosts in Cisco Packet Tracer. Standard ACL was used to block a specific host based on source IP address, while Extended ACL was used to control access to specific services such as FTP.
+
+
+Router command only
+enable
+configure terminal
+
+interface fastethernet0/0
+exit
+
+interface fastethernet1/0
+exit
+
+access-list 10 deny 10.10.10.11 0.0.0.255
+access-list 10 permit any
+
+interface fa0/0
+ip access-group 10 in
+exit
+
+access-list 100 permit tcp host 10.10.10.10 host 192.168.1.10 eq ftp
+access-list 100 deny tcp host 10.10.10.11 host 192.168.1.10 eq ftp
+access-list 100 permit ip any any
+
+interface fa0/0
+ip access-group 100 in
+exit
